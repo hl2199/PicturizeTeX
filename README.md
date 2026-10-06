@@ -2,7 +2,7 @@
 
 <img src="docs/icon.png" width="110" alt="PIcturizeTeX icon">
 
-# PIcturizeTeX
+# PicturizeTeX
 
 **LaTeX equations → SVG · PDF · PNG, natively on your Mac.**
 
