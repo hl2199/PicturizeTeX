@@ -11,6 +11,8 @@ struct SettingsPane: View {
     /// Shared with the app scene's MenuBarExtra(isInserted:) and the pane's
     /// remove button.
     @AppStorage("showMenuBarExtra") private var showMenuBarExtra = false
+    /// Read by DockPolicy when the last main window closes.
+    @AppStorage(DockPolicy.hideDockKey) private var hideDock = true
 
     var body: some View {
         ScrollView {
@@ -212,6 +214,11 @@ struct SettingsPane: View {
              + "even with this window closed.")
             .font(.caption)
             .foregroundStyle(.secondary)
+
+        Toggle("Hide Dock icon when window is closed", isOn: $hideDock)
+            .toggleStyle(.switch)
+            .controlSize(.small)
+            .disabled(!showMenuBarExtra)
     }
 
     // MARK: - Layout primitives

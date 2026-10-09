@@ -11,9 +11,18 @@ struct LatexToSVGApp: App {
     /// remove button via the same @AppStorage key.
     @AppStorage("showMenuBarExtra") private var showMenuBarExtra = false
 
+    init() {
+        // Quitting from the menu bar pane with the window closed would
+        // otherwise be restored as "no windows", so the next launch would show
+        // nothing. Window frames are still remembered via their autosave names.
+        UserDefaults.standard.register(defaults: ["NSQuitAlwaysKeepsWindows": false])
+    }
+
     var body: some Scene {
-        WindowGroup {
+        WindowGroup(id: DockPolicy.mainWindowID) {
             ContentView(model: model)
+                .onAppear { DockPolicy.mainWindowAppeared() }
+                .onDisappear { DockPolicy.mainWindowDisappeared() }
         }
         .commands { commands }
 

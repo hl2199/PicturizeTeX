@@ -65,6 +65,7 @@ struct MenuBarPane: View {
     /// Shared with the app scene's MenuBarExtra(isInserted:) and the settings
     /// toggle, so removal here can be undone from the main window.
     @AppStorage("showMenuBarExtra") private var showMenuBarExtra = false
+    @Environment(\.openWindow) private var openWindow
 
     private let paneWidth: CGFloat = 400
     private let previewHeight: CGFloat = 190
@@ -129,17 +130,26 @@ struct MenuBarPane: View {
                 .disabled(model.renderedSVG == nil)
             }
 
+            Divider()
+
             HStack {
-                Button("Remove from menu bar") {
-                    showMenuBarExtra = false
+                Button("Open PicturizeTeX") {
+                    DockPolicy.showMainWindow(using: openWindow)
                 }
-                .buttonStyle(.plain)
-                .foregroundStyle(Theme.accent)
-                .font(.caption)
+
                 Spacer()
-                Text("Restore it in the app's settings")
-                    .font(.caption2)
-                    .foregroundStyle(.tertiary)
+
+                // Removing the item while the window is closed would leave the
+                // app running with nothing on screen, so bring the window back.
+                Button("Remove from Menu Bar") {
+                    showMenuBarExtra = false
+                    DockPolicy.showMainWindow(using: openWindow)
+                }
+                .help("Restore it in the app's settings")
+
+                Button("Quit") {
+                    NSApp.terminate(nil)
+                }
             }
         }
         .padding(12)
