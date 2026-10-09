@@ -110,6 +110,8 @@ struct MenuBarPane: View {
                 .fixedSize()
             }
 
+            scaleDetail
+
             Divider()
 
             HStack {
@@ -156,6 +158,51 @@ struct MenuBarPane: View {
         .frame(width: paneWidth)
         .tint(Theme.accent)
         .task { model.renderNow() }
+    }
+
+    /// The selected scale's own settings, as in the main window's Scale card.
+    /// Without them, Match a font and Manual would be stuck at their defaults.
+    @ViewBuilder
+    private var scaleDetail: some View {
+        switch model.scaleChoice {
+        case .standard:
+            EmptyView()
+        case .matchFont:
+            HStack {
+                Spacer()
+                Picker("", selection: $model.fontFamily) {
+                    ForEach(NSFontManager.shared.availableFontFamilies, id: \.self) { family in
+                        Text(family).tag(family)
+                    }
+                }
+                .labelsHidden()
+                // A fixed width: .fixedSize() would size the popup to its
+                // widest menu item, and font family names run long.
+                .frame(width: 150)
+
+                TextField("", value: $model.fontSize, format: .number)
+                    .textFieldStyle(.roundedBorder)
+                    .multilineTextAlignment(.trailing)
+                    .frame(width: 44)
+
+                Text("pt")
+                    .foregroundStyle(.secondary)
+            }
+        case .manual:
+            HStack {
+                Spacer()
+                Text("1 ex =")
+                    .foregroundStyle(.secondary)
+
+                TextField("", value: $model.manualPixelsPerEx, format: .number)
+                    .textFieldStyle(.roundedBorder)
+                    .multilineTextAlignment(.trailing)
+                    .frame(width: 44)
+
+                Text("px")
+                    .foregroundStyle(.secondary)
+            }
+        }
     }
 
     private var preview: some View {
