@@ -3,9 +3,9 @@ import SwiftUI
 /// The app's small design vocabulary, drawn from mathematical publishing:
 /// a sheet of paper on a drafting desk, with one journal-spine red accent.
 enum Theme {
-    /// Viridian -- chalkboard green. The only accent colour; replaces the
-    /// default blue tint everywhere.
-    static let accent = Color(red: 0.180, green: 0.431, blue: 0.369)
+    /// Rosewood -- a muted, deeper take on the Margin app's red. The only
+    /// accent colour; replaces the default blue tint everywhere.
+    static let accent = Color(red: 0.710, green: 0.318, blue: 0.290)
 
     /// Warm paper for the equation sheet -- just off pure white, so the sheet
     /// reads as material rather than as empty screen.

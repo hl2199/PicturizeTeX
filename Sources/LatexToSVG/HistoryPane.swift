@@ -17,8 +17,10 @@ struct HistoryPane: View {
                     .foregroundStyle(.secondary)
                 Spacer()
                 if !model.history.isEmpty {
+                    // .link ignores the tint and draws system blue.
                     Button("Clear", action: model.clearHistory)
-                        .buttonStyle(.link)
+                        .buttonStyle(.plain)
+                        .foregroundStyle(Theme.accent)
                         .font(.caption)
                 }
             }

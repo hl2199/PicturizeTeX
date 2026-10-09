@@ -6,9 +6,9 @@
 
 **LaTeX equations → SVG · PDF · PNG, natively on your Mac.**
 
-[![Release](https://img.shields.io/github/v/release/hl2199/PicturizeTeX?color=2e6e5e)](../../releases)
-![Platform](https://img.shields.io/badge/macOS-14%2B%20·%20Apple%20Silicon-2e6e5e)
-[![License: MIT](https://img.shields.io/badge/license-MIT-2e6e5e)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/hl2199/PicturizeTeX?color=b5514a)](../../releases)
+![Platform](https://img.shields.io/badge/macOS-14%2B%20·%20Apple%20Silicon-b5514a)
+[![License: MIT](https://img.shields.io/badge/license-MIT-b5514a)](LICENSE)
 
 </div>
 

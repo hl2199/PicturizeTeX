@@ -3,7 +3,7 @@ import LatexRender
 
 // Generates the app icon: a hand-built monoline pi -- one even stroke, round
 // ends, straight bar and legs, and a quarter-circle foot on the right -- in
-// the app's accent viridian on the warm dotted paper of the desk.
+// the app's accent red on the warm dotted paper of the desk.
 // Run with the output directory as the only argument; writes AppIcon.iconset.
 @MainActor
 final class IconDelegate: NSObject, NSApplicationDelegate {
@@ -113,7 +113,7 @@ final class IconDelegate: NSObject, NSApplicationDelegate {
         t.translateX(by: -rect.midX, yBy: -rect.midY)
         t.concat()
 
-        NSColor(srgbRed: 0.180, green: 0.431, blue: 0.369, alpha: 1).setStroke()
+        NSColor(srgbRed: 0.710, green: 0.318, blue: 0.290, alpha: 1).setStroke()
         for stroke in [bar, left, right] {
             stroke.lineWidth = 84
             stroke.lineCapStyle = .round
