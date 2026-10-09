@@ -1,12 +1,12 @@
 <div align="center">
 
-<img src="docs/icon.png" width="110" alt="PIcturizeTeX icon">
+<img src="docs/icon.png" width="110" alt="PicturizeTeX icon">
 
 # PicturizeTeX
 
 **LaTeX equations → SVG · PDF · PNG, natively on your Mac.**
 
-[![Release](https://img.shields.io/github/v/release/hl2199/PIcturizeTeX?color=2e6e5e)](../../releases)
+[![Release](https://img.shields.io/github/v/release/hl2199/PicturizeTeX?color=2e6e5e)](../../releases)
 ![Platform](https://img.shields.io/badge/macOS-14%2B%20·%20Apple%20Silicon-2e6e5e)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2e6e5e)](LICENSE)
 
@@ -14,9 +14,9 @@
 
 A native Mac app that turns LaTeX equations into pictures — SVG, PDF, and PNG. For use in your figures, presentations, and whatever else you may need it for. Live preview, easy drag and drop, quick menu bar access, customizable color and size. Inspired by [viereck.ch/latex-to-svg](https://viereck.ch/latex-to-svg/), but I wanted to make it local. Also has quick menu bar option for generation on the go!
 
-<img width="800" alt="PIcturizeTeX main window" src="docs/screenshot-main.png" />
+<img width="800" alt="PicturizeTeX main window" src="docs/screenshot-main.png" />
 
-<img width="680" alt="PIcturizeTeX menu bar companion" src="docs/screenshot-menu-bar.png" />
+<img width="680" alt="PicturizeTeX menu bar companion" src="docs/screenshot-menu-bar.png" />
 
 ## Features
 
@@ -31,8 +31,8 @@ A native Mac app that turns LaTeX equations into pictures — SVG, PDF, and PNG.
 
 ## Install
 
-Download the latest `PIcturizeTeX-x.y.z.zip` from
-[Releases](../../releases), unzip it, and drag `PIcturizeTeX.app` into
+Download the latest `PicturizeTeX-x.y.z.zip` from
+[Releases](../../releases), unzip it, and drag `PicturizeTeX.app` into
 `/Applications`.
 
 Binary requires macOS 14 or later on Apple Silicon. Intel Macs: build from source.
@@ -43,12 +43,12 @@ run, macOS will raise a security warning and the app must be approved once by ha
 <details>
 <summary><strong>Step-by-step: approving the app on first launch</strong></summary>
 
-1. Open the app. A dialog appears saying *"Apple could not verify 'PIcturizeTeX'
+1. Open the app. A dialog appears saying *"Apple could not verify 'PicturizeTeX'
    is free of malware that may harm your Mac or compromise your privacy"*,
    offering only **Done** and **Move to Trash**. Click **Done** (not Move to
    Trash — that deletes the app).
 2. Open **System Settings → Privacy & Security** and scroll down to the
-   Security section. It says *"PIcturizeTeX" was blocked to protect your Mac*.
+   Security section. It says *"PicturizeTeX" was blocked to protect your Mac*.
    Click **Open Anyway** and authenticate. (The message only lingers for a few
    minutes after the blocked attempt — if it is missing, open the app again
    and come straight back.)
@@ -66,8 +66,8 @@ it takes about a minute and skips all of the above.
 Requires only the Xcode Command Line Tools (no Xcode):
 
 ```sh
-./Scripts/bundle.sh            # builds and assembles build/PIcturizeTeX.app
-open build/PIcturizeTeX.app
+./Scripts/bundle.sh            # builds and assembles build/PicturizeTeX.app
+open build/PicturizeTeX.app
 ```
 
 Release build: `./Scripts/bundle.sh release` · Tests: `swift test` ·
@@ -82,7 +82,7 @@ Release zip: `./Scripts/release.sh <version>`
 | `Sources/LatexToSVG` | The SwiftUI app. |
 | `Scripts/bundle.sh` | Assembles the `.app` from SwiftPM output (SwiftPM alone emits a bare executable, and WebKit requires a signed bundle). |
 
-Data lives in `~/Library/Application Support/PIcturizeTeX/` (`history.json`,
+Data lives in `~/Library/Application Support/PicturizeTeX/` (`history.json`,
 `preamble.tex`) — both plain text.
 
 To update MathJax, replace `Sources/LatexRender/Resources/mathjax/tex-svg.js`

@@ -31,7 +31,7 @@ public enum AppDirectories {
                                                in: .userDomainMask,
                                                appropriateFor: nil,
                                                create: true)
-        let directory = base.appendingPathComponent("PIcturizeTeX", isDirectory: true)
+        let directory = base.appendingPathComponent("PicturizeTeX", isDirectory: true)
 
         // One-time migration from the app's pre-release name, so history and
         // preamble survive the rename.

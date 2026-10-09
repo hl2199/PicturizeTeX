@@ -13,14 +13,14 @@ CONFIG="${1:-debug}"
 VERSION="${VERSION:-1.0}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 BUILD="$ROOT/.build/$CONFIG"
-APP="$ROOT/build/PIcturizeTeX.app"
+APP="$ROOT/build/PicturizeTeX.app"
 
 swift build -c "$CONFIG" --package-path "$ROOT"
 
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 
-cp "$BUILD/LatexToSVG" "$APP/Contents/MacOS/PIcturizeTeX"
+cp "$BUILD/LatexToSVG" "$APP/Contents/MacOS/PicturizeTeX"
 
 # SwiftPM emits one .bundle per target that declares resources. Bundle.module
 # locates these relative to the main bundle's resource directory.
@@ -36,12 +36,12 @@ cat > "$APP/Contents/Info.plist" <<PLIST
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>CFBundleName</key>              <string>PIcturizeTeX</string>
-    <key>CFBundleDisplayName</key>       <string>PIcturizeTeX</string>
+    <key>CFBundleName</key>              <string>PicturizeTeX</string>
+    <key>CFBundleDisplayName</key>       <string>PicturizeTeX</string>
     <key>CFBundleIdentifier</key>        <string>com.lucyliu.picturizetex</string>
     <key>CFBundleVersion</key>           <string>$VERSION</string>
     <key>CFBundleShortVersionString</key><string>$VERSION</string>
-    <key>CFBundleExecutable</key>        <string>PIcturizeTeX</string>
+    <key>CFBundleExecutable</key>        <string>PicturizeTeX</string>
     <key>CFBundleIconFile</key>          <string>AppIcon</string>
     <key>CFBundlePackageType</key>       <string>APPL</string>
     <!-- Without a principal class the process starts, and even installs a menu
