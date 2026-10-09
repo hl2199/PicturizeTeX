@@ -1,0 +1,52 @@
+# Builds PicturizeTeX on GitHub's macOS runners. Pushing a tag like v1.0.6
+# publishes a Release with the zipped app; running it by hand only uploads a
+# test build.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: swift --version
+
+      - run: swift test
+
+      - name: Set version
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then version="${GITHUB_REF_NAME#v}"; else version="0.0.0-dev.$GITHUB_RUN_NUMBER"; fi
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+
+      - name: Build and package
+        run: |
+          Scripts/release.sh "$VERSION"
+          codesign --verify --deep --strict build/PicturizeTeX.app
+          lipo -archs build/PicturizeTeX.app/Contents/MacOS/PicturizeTeX
+
+      - name: Upload test build
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: PicturizeTeX-${{ env.VERSION }}
+          path: build/PicturizeTeX-${{ env.VERSION }}.zip
+
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: PicturizeTeX ${{ env.VERSION }}
+          files: build/PicturizeTeX-${{ env.VERSION }}.zip
+          generate_release_notes: true
+          body: |
+            Download `PicturizeTeX-${{ env.VERSION }}.zip`, unzip it and drag PicturizeTeX.app into Applications. Requires macOS 14 or later on Apple Silicon.
+
+            This build is not notarized, so macOS blocks the first launch. Approve it once in **System Settings → Privacy & Security → Open Anyway** (step-by-step instructions are in the [README](https://github.com/hl2199/PicturizeTeX#install)).
