@@ -1,65 +1,37 @@
 import AppKit
-import LatexCore
 import LatexRender
 
-// Generates the app icon: a Computer Modern pi, typeset by the app's own
-// MathJax engine, in the app's carmine on the warm dotted paper of the desk.
+// Generates the app icon: a hand-built monoline pi -- one even stroke, round
+// ends, straight bar and legs, and a quarter-circle foot on the right -- in
+// the app's accent viridian on the warm dotted paper of the desk.
 // Run with the output directory as the only argument; writes AppIcon.iconset.
 @MainActor
 final class IconDelegate: NSObject, NSApplicationDelegate {
-    let engine = RenderEngine()
-    let exporter = Exporter()
-
     func applicationDidFinishLaunching(_ notification: Notification) {
-        Task {
-            do {
-                let outDir = URL(fileURLWithPath: CommandLine.arguments[1], isDirectory: true)
+        do {
+            let outDir = URL(fileURLWithPath: CommandLine.arguments[1], isDirectory: true)
+            let master = Self.compose()
 
-                // The glyph, in the app's accent viridian.
-                let r = try await engine.render(latex: #"\pi"#, preamble: "", displayMode: true)
-                let svg = SVGDocument.finalize(rawSVG: r.svg, widthEx: r.widthEx, heightEx: r.heightEx,
-                                               pixelsPerEx: 100, color: .custom("#2E6E5E"))
-                let size = SVGDocument.pixelSize(widthEx: r.widthEx, heightEx: r.heightEx, pixelsPerEx: 100)
-                // The export webview occasionally captures before the SVG has
-                // painted, yielding a blank glyph (this bit us twice and was
-                // misdiagnosed as a drawing bug). Verify pixels and retry.
-                var glyphPNG = Data()
-                for attempt in 1...3 {
-                    let pdf = try await exporter.pdfData(svg: svg,
-                                                         widthPx: size.width, heightPx: size.height)
-                    // Rasterise at 2x the drawn size so the master stays sharp.
-                    glyphPNG = try Exporter.pngData(pdf: pdf, dpi: 96.0 * (960.0 / size.height))
-                    if Self.hasOpaquePixels(glyphPNG) { break }
-                    print("attempt \(attempt): blank glyph, retrying")
-                    try await Task.sleep(for: .milliseconds(300))
-                }
-                guard Self.hasOpaquePixels(glyphPNG), let glyph = NSImage(data: glyphPNG) else {
-                    throw RenderError.engineFailure("glyph stayed blank after 3 attempts")
-                }
-
-                let master = Self.compose(glyph: glyph)
-
-                // Emit the iconset. macOS wants each size and its @2x pair.
-                let iconset = outDir.appendingPathComponent("AppIcon.iconset")
-                try? FileManager.default.removeItem(at: iconset)
-                try FileManager.default.createDirectory(at: iconset, withIntermediateDirectories: true)
-                for base in [16, 32, 128, 256, 512] {
-                    try Self.writePNG(master, pixels: base,
-                                      to: iconset.appendingPathComponent("icon_\(base)x\(base).png"))
-                    try Self.writePNG(master, pixels: base * 2,
-                                      to: iconset.appendingPathComponent("icon_\(base)x\(base)@2x.png"))
-                }
-                print("ICONSET: \(iconset.path)")
-                exit(0)
-            } catch {
-                print("FAILED: \(error)")
-                exit(1)
+            // Emit the iconset. macOS wants each size and its @2x pair.
+            let iconset = outDir.appendingPathComponent("AppIcon.iconset")
+            try? FileManager.default.removeItem(at: iconset)
+            try FileManager.default.createDirectory(at: iconset, withIntermediateDirectories: true)
+            for base in [16, 32, 128, 256, 512] {
+                try Self.writePNG(master, pixels: base,
+                                  to: iconset.appendingPathComponent("icon_\(base)x\(base).png"))
+                try Self.writePNG(master, pixels: base * 2,
+                                  to: iconset.appendingPathComponent("icon_\(base)x\(base)@2x.png"))
             }
+            print("ICONSET: \(iconset.path)")
+            exit(0)
+        } catch {
+            print("FAILED: \(error)")
+            exit(1)
         }
     }
 
     /// Draws the 1024-pt master: paper squircle, dot grid, centred glyph.
-    static func compose(glyph: NSImage) -> NSImage {
+    static func compose() -> NSImage {
         let canvas = NSImage(size: NSSize(width: 1024, height: 1024))
         canvas.lockFocus()
 
@@ -100,30 +72,55 @@ final class IconDelegate: NSObject, NSApplicationDelegate {
         }
         NSGraphicsContext.restoreGraphicsState()
 
-        // The glyph, optically centred (a touch above geometric centre). Drawn
-        // into an explicit rect: the exporter stamps the PNG with its true
-        // export point size, which is far smaller than the icon needs.
-        let targetHeight: CGFloat = 460
-        let aspect = glyph.size.width / glyph.size.height
-        let gRect = NSRect(x: rect.midX - targetHeight * aspect / 2,
-                           y: rect.midY - targetHeight / 2 + 10,
-                           width: targetHeight * aspect,
-                           height: targetHeight)
-        glyph.draw(in: gRect, from: .zero, operation: .sourceOver, fraction: 1.0)
+        drawGlyph(in: rect)
 
         canvas.unlockFocus()
         return canvas
     }
 
-    /// True if the PNG contains any meaningfully opaque pixel.
-    static func hasOpaquePixels(_ png: Data) -> Bool {
-        guard let rep = NSBitmapImageRep(data: png) else { return false }
-        for x in stride(from: 0, to: rep.pixelsWide, by: 4) {
-            for y in stride(from: 0, to: rep.pixelsHigh, by: 4) {
-                if (rep.colorAt(x: x, y: y)?.alphaComponent ?? 0) > 0.5 { return true }
-            }
+    /// The pi, stroked at one width with round caps so every end is soft.
+    /// Optically centred: a touch above the sheet's geometric centre.
+    static func drawGlyph(in rect: NSRect) {
+        // The bar overhangs the left leg less than the right, so shift the
+        // glyph to centre its overall width on the sheet.
+        let legX: CGFloat = 92, leftBar: CGFloat = 190, rightBar: CGFloat = 225
+        let cx = rect.midX + (leftBar - rightBar) / 2, cy = rect.midY + 6
+        let top = cy + 165, bottom = cy - 185
+        let footRadius: CGFloat = 78
+
+        let bar = NSBezierPath()
+        bar.move(to: NSPoint(x: cx - leftBar, y: top))
+        bar.line(to: NSPoint(x: cx + rightBar, y: top))
+
+        let left = NSBezierPath()
+        left.move(to: NSPoint(x: cx - legX, y: top))
+        left.line(to: NSPoint(x: cx - legX, y: bottom))
+
+        // Right leg: straight down into a quarter-circle foot that turns right.
+        let right = NSBezierPath()
+        right.move(to: NSPoint(x: cx + legX, y: top))
+        right.line(to: NSPoint(x: cx + legX, y: bottom + footRadius))
+        right.appendArc(withCenter: NSPoint(x: cx + legX + footRadius, y: bottom + footRadius),
+                        radius: footRadius, startAngle: 180, endAngle: 270)
+        right.line(to: NSPoint(x: cx + legX + footRadius + 20, y: bottom))
+
+        // Scale the whole glyph, stroke included, about the sheet's centre.
+        let scale: CGFloat = 1.06
+        NSGraphicsContext.saveGraphicsState()
+        let t = NSAffineTransform()
+        t.translateX(by: rect.midX, yBy: rect.midY)
+        t.scale(by: scale)
+        t.translateX(by: -rect.midX, yBy: -rect.midY)
+        t.concat()
+
+        NSColor(srgbRed: 0.180, green: 0.431, blue: 0.369, alpha: 1).setStroke()
+        for stroke in [bar, left, right] {
+            stroke.lineWidth = 84
+            stroke.lineCapStyle = .round
+            stroke.lineJoinStyle = .round
+            stroke.stroke()
         }
-        return false
+        NSGraphicsContext.restoreGraphicsState()
     }
 
     static func writePNG(_ image: NSImage, pixels: Int, to url: URL) throws {
